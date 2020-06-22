@@ -82,32 +82,6 @@
         w(b)
     });
     
-    var B = t(".dt-init");
-    B.length > 0 && B.each(function() {
-        var e = t(this)
-          , a = e.data("items") ? e.data("items") : 5;
-        e.DataTable({
-            ordering: !1,
-            autoWidth: !1,
-            dom: '<"table-wrap"t><"row align-items-center"<"col-md-9"p><"col-md-3 text-left text-md-right"i>>',
-            pageLength: a,
-            bPaginate: t(".data-table tbody tr").length > a,
-            iDisplayLength: a,
-            language: {
-                search: "",
-                searchPlaceholder: "Type in to Search",
-                info: "_START_ -_END_ of _TOTAL_",
-                infoEmpty: "No records",
-                infoFiltered: "( Total _MAX_  )",
-                paginate: {
-                    first: "First",
-                    last: "Last",
-                    next: "Next",
-                    previous: "Prev"
-                }
-            }
-        })
-    });
     
     var R = t(".drop-toggle");
     R.length > 0 && R.on("click", function(a) {

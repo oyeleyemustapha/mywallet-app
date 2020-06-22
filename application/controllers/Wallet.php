@@ -90,45 +90,23 @@ class Wallet extends CI_Controller {
     //DASHBOARD
     public function dashboard(){
         $this->verify();
-
-        $this->curl->get(BASE_URL.'user');
-        if(!$this->curl->error){
-            $data['pageTitle']="Dashboard";
-            $data['userInfo']=$this->curl->response;
-            $data['transactions']=$this->fetch_transactions(5);
-            $this->load->view('parts/header', $data);
-            $this->load->view('dashboard', $data);
-            $this->load->view('parts/footer', $data);
-        }
-        else{
-              var_dump($this->curl->errorCode);
-              if($this->curl->errorCode==401){
-                    $this->session->set_flashdata('error', 'You are not authorized.');
-                    redirect(base_url());
-              } 
-        }
+        $data['pageTitle']="Dashboard";
+        $data['userInfo']=$this->userInfo();
+        $data['transactions']=$this->fetch_transactions(5);
+        $this->load->view('parts/header', $data);
+        $this->load->view('dashboard', $data);
+        $this->load->view('parts/footer', $data);
     }
 
 
     //PROFILE
     public function profile(){
         $this->verify();
-        $this->curl->get(BASE_URL.'user');
-        if(!$this->curl->error){
-            $data['pageTitle']="Profile";
-            $data['userInfo']=$this->curl->response;
-            $this->load->view('parts/header', $data);
-            $this->load->view('profile', $data);
-            $this->load->view('parts/footer', $data);
-        }
-        else{
-
-            var_dump($this->curl->errorCode);
-            if($this->curl->errorCode==401){
-                    $this->session->set_flashdata('error', 'You are not authorized.');
-                    redirect(base_url());
-             } 
-        }
+        $data['pageTitle']="Profile";
+        $data['userInfo']=$this->userInfo();
+        $this->load->view('parts/header', $data);
+        $this->load->view('profile', $data);
+        $this->load->view('parts/footer', $data);
     }
 
 
@@ -260,34 +238,302 @@ class Wallet extends CI_Controller {
 
 
     //WALLET
-
     public function wallet(){
         $this->verify();
-        $this->curl->get(BASE_URL.'user');
-        if(!$this->curl->error){
-            $data['pageTitle']="My Wallet";
-            $data['userInfo']=$this->curl->response;
-            $data['wallet']= $this->fetch_wallet_info();
-            $this->load->view('parts/header', $data);
-            $this->load->view('wallet', $data);
-            $this->load->view('parts/footer', $data);
-        }
-        else{
-              var_dump($this->curl->errorCode);
-              if($this->curl->errorCode==401){
-                    $this->session->set_flashdata('error', 'You are not authorized.');
-                    redirect(base_url());
-              } 
-        }
-
+        $data['pageTitle']="My Wallet";
+        $data['userInfo']=$this->userInfo();
+        $data['wallet']= $this->fetch_wallet_info();
+        $this->load->view('parts/header', $data);
+        $this->load->view('wallet', $data);
+        $this->load->view('parts/footer', $data);
     }
 
     private function fetch_wallet_info(){
         $this->verify();
         $this->curl->get(BASE_URL.'wallet');
-        return $this->curl->response;
+        if($this->curl->error){
+            return false;
+        }
+        else{
+            return $this->curl->response;
+        }
     }
 
+
+    //TRANSACTIONS
+    public function transactions(){
+        $this->verify();
+        $data['pageTitle']="Transactions";
+        $data['userInfo']=$this->userInfo();
+        $data['transactions']= $this->fetch_transactions();
+        $this->load->view('parts/header', $data);
+        $this->load->view('transactions', $data);
+        $this->load->view('parts/footer', $data);
+    }
+
+
+    //TRANSACTION
+    public function transaction_info(){
+        $this->verify();
+        $this->form_validation->set_rules('transaction_id', 'Transaction', 'required');
+        if($this->form_validation->run()){
+            $data['details']=$this->transaction($this->input->post('transaction_id'));
+            $this->load->view('transaction', $data);
+        }
+    }
+
+    //FETCH TRANSACTION DETAILS
+    private function transaction($transaction_id){
+        $this->verify();
+        $this->curl->get(BASE_URL.'transaction/'.$transaction_id);
+        if($this->curl->error){
+            return false;
+        }
+        else{
+            return $this->curl->response;
+        }
+    }
+
+
+    //FETCH USER INFO
+     private function userinfo(){
+        $this->verify();
+        $this->curl->get(BASE_URL.'user');
+        if($this->curl->error){
+            return false;
+        }
+        else{
+            return $this->curl->response;
+        }
+    }
+
+
+
+    //FUND WALLET
+    public function fund_wallet(){
+        $this->verify();
+        $data['pageTitle']="Fund Wallet";
+        $data['userInfo']=$this->userInfo();
+        $data['wallet']= $this->fetch_wallet_info();
+        $data['scripts']='<script src="https://js.paystack.co/v2/inline.js"></script>';
+       
+        $this->load->view('parts/header', $data);
+        $this->load->view('fund', $data);
+        $this->load->view('parts/footer', $data);
+    }
+
+
+    //VEFIFY TRANSACTION
+    public function verify_payment(){
+        $this->verify();
+        $this->form_validation->set_rules('wallet', 'Wallet', 'required');
+        $this->form_validation->set_rules('ref_no', 'Reference ID', 'required');
+        $this->form_validation->set_rules('amount', 'Amount Paid', 'required|numeric');
+        if($this->form_validation->run()){
+            $result = array();
+                $url = 'https://api.paystack.co/transaction/verify/'.$this->input->post('ref_no');
+                $ch = curl_init();
+                curl_setopt($ch, CURLOPT_URL, $url);
+                //curl_setopt($ch, CURLOPT_SSLVERSION , 3);
+                //curl_setopt($ch, CURLOPT_IPRESOLVE, CURL_IPRESOLVE_V4); 
+                curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, FALSE);
+                curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);
+                curl_setopt(
+                  $ch, CURLOPT_HTTPHEADER, [
+                    'Authorization: Bearer sk_test_161d94e383c5f48a5c95ce2f1ac4406dc2c727d7']
+                );
+                $request = curl_exec($ch);
+                if($request){
+                     $result = json_decode($request, true);
+                     if($result['data']['status'] == 'success'){
+
+
+                        //CREDIT RECIEVER WALLET
+                        $credit_data=array(
+                            'WALLET'=> $this->input->post('wallet'),
+                            'AMOUNT'=> $this->input->post('amount')/100,
+                            'DESCRIPTION'=>"Wallet funding through paystack with Reference number  ".$this->input->post('ref_no')
+                        );
+                        if($this->credit($credit_data)->status=="successful"){
+                            echo "Your wallet has been credited";
+                        }
+                        else{
+                            echo "There is an error crediting your wallet.";
+                        }
+                     }
+                     else{
+                        echo "Transaction was not successful.";
+                     }
+
+                }
+                else{
+                    if($errno = curl_errno($ch)) {
+                        $error_message = curl_strerror($errno);
+                        echo $error_message;
+                    }
+                }
+                curl_close($ch);
+        }
+        else{
+            echo form_error('ref_no');
+        }
+    }
+
+
+
+
+
+    //TRANSFER
+    public function transfer(){
+        $this->verify();
+            $data['pageTitle']="Transfer";
+            $data['userInfo']=$this->userInfo();
+            $data['transactions']= $this->fetch_transactions();
+            $this->load->view('parts/header', $data);
+            $this->load->view('transfer', $data);
+            $this->load->view('parts/footer', $data);
+    }
+
+
+    //CHECK IF WALLET NUMBER EXIST
+    private function isWalletExist($wallet_no){
+        $this->verify();
+        $this->curl->get(BASE_URL.'wallet/'.$wallet_no);
+        if($this->curl->error){
+            return false;
+        }
+        else{
+            return $this->curl->response;
+        }
+    }
+
+
+    //VERIFY WALLET NUMBER
+    public function verify_wallet(){
+        $this->verify();
+        $this->form_validation->set_rules('wallet_no', 'wallet Number', 'required');
+        if($this->form_validation->run()){
+            if($this->isWalletExist($this->input->post('wallet_no'))==false){
+                echo "Wallet number is not valid";
+            }
+        }
+    }
+
+
+    //PROCESS FUND TRANSFER
+    public function process_transfer(){
+        $this->verify();
+        $this->form_validation->set_rules('reciever', 'wallet Number', 'required');
+        $this->form_validation->set_rules('wallet_balance', 'wallet Balance', 'required|numeric');
+        $this->form_validation->set_rules('amount', 'Amount', 'required|numeric');
+        $this->form_validation->set_rules('sender', 'Sender', 'required');
+        
+        if($this->form_validation->run()){
+
+            $data=array(
+                'WALLET_NO'=>trim($this->input->post('reciever')),
+                'AMOUNT'=>trim($this->input->post('amount')),
+                'WALLET_BALANCE'=>trim($this->input->post('wallet_balance'))
+            );
+
+            if($this->isWalletExist($data['WALLET_NO'])!=false){
+                
+                //CHECK IF TRANSFER AMOUNT IS GREATER THAN THE WALLET BALANCE
+                if($data['AMOUNT']>$data['WALLET_BALANCE']){
+                    echo "Transfer amount can't be greater than Wallet balance";
+                }
+                else{
+
+
+                    
+                    //DEBIT SENDER WALLET
+                    $debit_data=array(
+                        'WALLET'=> $this->input->post('sender'),
+                        'AMOUNT'=> $data['AMOUNT'],
+                        'DESCRIPTION' =>"Fund transfer to ".$data['WALLET_NO']
+                    );
+                    $this->debit($debit_data);                   
+                
+
+                    //CREDIT RECIEVER WALLET
+                    $credit_data=array(
+                        'WALLET'=> $data['WALLET_NO'],
+                        'AMOUNT'=> $data['AMOUNT'],
+                        'DESCRIPTION'=>"Fund transfer from  ".$this->input->post('sender')
+                    );
+                    $this->credit($credit_data);
+
+                    echo "Transfer successful.";
+                }  
+            }
+            else{
+                echo "Wallet number is not valid";
+            }
+        }
+        else{
+
+            $error="";
+
+            if(form_error('wallet')){
+                $error.=form_error('wallet');
+            }
+
+            if(form_error('wallet_balance')){
+                $error.=form_error('wallet_balance');
+            }
+
+            if(form_error('amount')){
+                $error.=form_error('amount');
+            }
+            if(form_error('sender')){
+                $error.=form_error('sender');
+            }
+            echo $error;
+        }  
+    }
+
+
+
+    //DEBIT WALLET
+    private function debit($debit_data){
+        $this->verify();
+        $this->curl->post(BASE_URL.'debit', array(
+            'wallet_no'=> $debit_data['WALLET'],
+            'amount'=> $debit_data['AMOUNT'],
+            'description'=> $debit_data['DESCRIPTION']
+        ));
+        if($this->curl->error){
+            return false;
+        }
+        else{
+            return $this->curl->response;
+        }
+    }
+
+
+     //CREDIT WALLET
+    private function credit($credit_data){
+        $this->verify();
+        $this->curl->post(BASE_URL.'credit',  array(
+            'wallet_no'=> $credit_data['WALLET'],
+            'amount'=> $credit_data['AMOUNT'],
+            'description'=> $credit_data['DESCRIPTION']
+        ));
+        if($this->curl->error){
+            return false;
+        }
+        else{
+            return $this->curl->response;
+        }
+    }
+
+
+
+
+
+
+
+   
 
 
 

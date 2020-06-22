@@ -2,8 +2,9 @@
             <div class="container">
                 <div class="row">
 
-                    <!-- .col -->
-                    <div class="col-lg-12">
+                    
+                    <div class="col-lg-12 mt-5">
+                        
                         <div class="token-information card card-full-height">
                             <div class="row no-gutters height-100">
                                 <div class="col-md-6 text-center">

@@ -12037,3 +12037,14 @@ p+.timeline-content-info {
 .token-info span{
 	font-size: 20px;
 }
+
+.modal label{
+    font-weight: 800;
+}
+
+.notice{
+    color: red;
+    font-size: 12px;
+    display: block;
+    margin-bottom: 12px; 
+}

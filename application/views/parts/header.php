@@ -3,17 +3,17 @@
 
 echo'
 <!DOCTYPE html>
-<html lang="zxx" class="js">
+<html>
       <head>
-        <meta charset="utf-8">
+        <meta charset="utf-8">  
+        <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
         <link rel="shortcut icon" href="assets/images/favicon.png">
         <title>MyWallet - '.$pageTitle.'</title>
-
         <link rel="stylesheet" href="assets/css/bootstrap.min.css">
         <link rel="stylesheet" href="assets/css/vendor.css">
         <link rel="stylesheet" href="assets/fonts/font-awesome/css/font-awesome.min.css">
         <link rel="stylesheet" href="assets/sweet-alert2/sweetalert2.css">
-        
+        <link rel="stylesheet" href="assets/DataTables/dataTables.bootstrap4.min.css">
         <link rel="stylesheet" href="assets/css/style.css" id="layoutstyle">
     </head>
     <body class="page-user">
@@ -94,20 +94,20 @@ echo'
                             </li>
                             
                             <li>
-                                <a href="transactions.html">
+                                <a href="'.base_url('transactions').'">
                                     <i class="fa fa-money fa-fw"></i>&nbsp;&nbsp;
                                     Transactions
                                 </a>
                             </li>
 
                             <li>
-                                <a href="transfer.html">
+                                <a href="'.base_url("transfer").'">
                                     <em class="ikon ikon-transactions"></em>
                                     Transfer
                                 </a>
                             </li>
                             <li>
-                                <a href="fund-wallet.html">
+                                <a href="'.base_url('fund').'">
                                     <em class="fa fa-plus"></em> &nbsp; &nbsp;
                                     Fund Wallet
                                 </a>
