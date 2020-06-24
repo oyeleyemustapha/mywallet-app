@@ -1,13 +1,13 @@
 <?php
 defined('BASEPATH') OR exit('No direct script access allowed');
 
-
 if($_SERVER['HTTP_HOST']=='localhost'){
 	$active_group = 'default';
 }
 else{
 	$active_group = 'production';
 }
+
 
 $query_builder = TRUE;
 
@@ -37,9 +37,9 @@ $db['default'] = array(
 $db['production'] = array(
 	'dsn'	=> '',
 	'hostname' => 'localhost',
-	'username' => 'flawle11_cms',
-	'password' => 'T^vMfTuHtE6e',
-	'database' => 'flawle11_cms',
+	'username' => 'toneclea_mywallet',
+	'password' => 'kV1D.t,^a8Mv',
+	'database' => 'toneclea_mywallet',
 	'dbdriver' => 'mysqli',
 	'dbprefix' => '',
 	'pconnect' => FALSE,

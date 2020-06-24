@@ -34,7 +34,7 @@
                                     <h4 class="card-title">Recent Transactions</h4>
                                     <div class="card-opt">
                                         <a href="transactions" class="link ucap">
-                                            View ALL <em class="fas fa-angle-right ml-2"></em>
+                                            View ALL
                                         </a>
                                     </div>
                                 </div>

@@ -11,8 +11,12 @@ class Wallet extends CI_Controller {
          
         $this->load->helper('string');
         $this->load->library('form_validation');
-        
-        define('BASE_URL', 'http://localhost/wallet-api/customers/');
+        if($_SERVER['HTTP_HOST']=='localhost'){
+            define('BASE_URL', 'http://localhost/wallet-api/customers/');
+        }
+        else{
+            define('BASE_URL', 'https://tonecleaning.com/wallet-api/customers/');
+        }
         $this->curl=new Curl();
         if(!isset($_SESSION['TOKEN'])){
             $token=NULL;
@@ -75,13 +79,22 @@ class Wallet extends CI_Controller {
     public function logout(){
         unset($_SESSION['TOKEN']);
         redirect(base_url());
-
     }
 
     //VERIFY USER
     private function verify(){
         if(!isset($_SESSION['TOKEN'])){
              $this->session->set_flashdata('error', 'Please login with your account');
+            redirect(base_url());
+        }
+        $this->curl->get(BASE_URL.'user');
+        if($this->curl->error){
+            $this->session->set_flashdata('error', 'Your session has expired, please login.');
+            redirect(base_url());
+        }
+
+        if(isset($this->userInfo) && $this->userInfo==false){
+            $this->session->set_flashdata('error', 'Your session has expired, please login.');
             redirect(base_url());
         }
     }

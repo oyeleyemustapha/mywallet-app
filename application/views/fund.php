@@ -10,7 +10,7 @@
 
                                 <div class="col-lg-8 offset-lg-2 p-5">
 
-                                    <p class="text-center"><img src="assets/images/paystack.png"></p>
+
                                     <form method="post" id="fundWallet">
 
                                         
@@ -28,6 +28,9 @@
 
                                         <button class="btn btn-primary payButton">Pay</button>
                                     </form>
+
+<br>
+                                                                        <p class="text-center mt-5"><img src="assets/images/paystack.png"></p>
 
 
                                 </div>

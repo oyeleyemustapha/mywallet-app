@@ -5391,7 +5391,8 @@ select.select-sm {
 
 .user-links li a {
     display: block;
-    padding: 5px 15px
+    padding: 5px 15px;
+    color: #1D3557;
 }
 
 .user-links li a .ti {
